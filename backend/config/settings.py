@@ -160,11 +160,11 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "no-reply@example.com"
 
 DJOSER = {
-    "LOGIN_FIELD": "email",
-    "USER_CREATE_PASSWORD_RETYPE": True,
-    "SEND_ACTIVATION_EMAIL": True,
-    "ACTIVATION_URL": "activate?uid={uid}&token={token}",
-    "PASSWORD_RESET_CONFIRM_URL": "reset-password?uid={uid}&token={token}",
+    "LOGIN_FIELD": "email",  # Use email as login field
+    "USER_CREATE_PASSWORD_RETYPE": True,  # Require password confirmation during signup (security enhancement)
+    "SEND_ACTIVATION_EMAIL": False,  # Disable email activation for development (testing convenience)
+    "ACTIVATION_URL": "activate?uid={uid}&token={token}",  # Email activation link URL pattern
+    "PASSWORD_RESET_CONFIRM_URL": "reset-password?uid={uid}&token={token}",  # Password reset link URL pattern
 }
 
 STATIC_URL = "static/"

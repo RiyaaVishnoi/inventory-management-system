@@ -8,7 +8,9 @@ const Signup = () => {
     lastName: "",
     productionCompany: "",
     email: "",
+    username: "",
     password: "",
+    rePassword: "",
   });
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -24,15 +26,27 @@ const Signup = () => {
     setIsLoading(true);
     setMessage("");
 
+    // Validate password match
+    if (form.password !== form.rePassword) {
+      setMessage("Signup failed: Passwords do not match");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       // Send registration request to Djoser API endpoint
-      // Note: We only send email and password as required by the backend
+      // Note: We need to send email, username, password, and re_password as required by the backend
       const registrationData = {
         email: form.email,
+        username: form.username,
         password: form.password,
+        re_password: form.rePassword,
       };
 
-      await axios.post("http://127.0.0.1:8000/auth/users/", registrationData);
+      await axios.post(
+        "http://127.0.0.1:8000/api/auth/users/",
+        registrationData
+      );
       setMessage("Signup successful! You can now log in.");
 
       // Redirect to login page after successful signup
@@ -43,6 +57,12 @@ const Signup = () => {
       // Handle different types of errors from the API
       if (error.response?.data?.email) {
         setMessage("Signup failed: " + error.response.data.email[0]);
+      } else if (error.response?.data?.username) {
+        setMessage("Signup failed: " + error.response.data.username[0]);
+      } else if (error.response?.data?.password) {
+        setMessage("Signup failed: " + error.response.data.password[0]);
+      } else if (error.response?.data?.re_password) {
+        setMessage("Signup failed: " + error.response.data.re_password[0]);
       } else {
         setMessage("Signup failed: Please try again");
       }
@@ -268,6 +288,40 @@ const Signup = () => {
               </div>
             </div>
 
+            {/* Username Input Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Username
+              </label>
+              <div className="relative">
+                {/* User icon for username */}
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  name="username"
+                  value={form.username}
+                  onChange={handleChange}
+                  placeholder="johndoe"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
+                  required
+                />
+              </div>
+            </div>
+
             {/* Password Input Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -294,6 +348,40 @@ const Signup = () => {
                   type="password"
                   name="password"
                   value={form.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Confirm Password Input Field */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Confirm Password
+              </label>
+              <div className="relative">
+                {/* Lock icon for password */}
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type="password"
+                  name="rePassword"
+                  value={form.rePassword}
                   onChange={handleChange}
                   placeholder="••••••••"
                   className="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
