@@ -24,12 +24,7 @@ def is_unitec_email(email: str) -> bool:
     
     # List of Unitec email domains
     unitec_domains = [
-        'unitec.ac.nz',
         'myunitec.ac.nz',
-        'student.unitec.ac.nz',
-        'staff.unitec.ac.nz',
-        'faculty.unitec.ac.nz',
-        # Add more Unitec domains if needed
     ]
     
     return domain.lower() in unitec_domains

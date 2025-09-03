@@ -51,10 +51,8 @@ const Signup = () => {
         registrationData
       );
 
-      // Check if email is from Unitec domain to determine approval status
-      const isUnitecEmail =
-        form.email.includes("@unitec.ac.nz") ||
-        form.email.includes("@myunitec.ac.nz");
+             // Check if email is from Unitec domain to determine approval status
+       const isUnitecEmail = form.email.includes("@myunitec.ac.nz");
 
       if (isUnitecEmail) {
         setMessage("Signup successful! You can now log in.");
