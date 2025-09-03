@@ -7,17 +7,17 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 
     # Djoser auth
-    path("api/auth/", include("djoser.urls")),
-    path("api/auth/", include("djoser.urls.jwt")),
+    path("auth/", include("djoser.urls")),
+    path("auth/", include("djoser.urls.jwt")),
 
     # OpenAPI schema + Swagger UI (drf-spectacular)
-    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
-        "api/docs/",
+        "docs/",
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
 
     # Test protected endpoint
-    path("api/me/", me),
+    path("me/", me),
 ]

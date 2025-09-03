@@ -47,12 +47,12 @@ const Signup = () => {
       };
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/auth/users/",
+        "http://127.0.0.1:8000/auth/users/",
         registrationData
       );
 
-             // Check if email is from Unitec domain to determine approval status
-       const isUnitecEmail = form.email.includes("@myunitec.ac.nz");
+      // Check if email is from Unitec domain to determine approval status
+      const isUnitecEmail = form.email.includes("@myunitec.ac.nz");
 
       if (isUnitecEmail) {
         setMessage("Signup successful! You can now log in.");

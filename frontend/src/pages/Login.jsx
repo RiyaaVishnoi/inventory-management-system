@@ -21,7 +21,7 @@ const Login = () => {
     try {
       // Send authentication request to Djoser JWT endpoint
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/auth/jwt/create/",
+        "http://127.0.0.1:8000/auth/jwt/create/",
         form
       );
 
@@ -31,7 +31,7 @@ const Login = () => {
 
       // Check user approval status
       try {
-        const userResponse = await axios.get("http://127.0.0.1:8000/api/me/", {
+        const userResponse = await axios.get("http://127.0.0.1:8000/me/", {
           headers: {
             Authorization: `Bearer ${response.data.access}`,
           },
