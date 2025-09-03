@@ -46,10 +46,7 @@ const Signup = () => {
         year_group: form.yearGroup,
       };
 
-      const response = await axios.post(
-        "http://127.0.0.1:8000/auth/users/",
-        registrationData
-      );
+      await axios.post("http://127.0.0.1:8000/auth/users/", registrationData);
 
       // Check if email is from Unitec domain to determine approval status
       const isUnitecEmail = form.email.includes("@myunitec.ac.nz");

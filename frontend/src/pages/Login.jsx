@@ -29,7 +29,7 @@ const Login = () => {
       localStorage.setItem("access", response.data.access);
       localStorage.setItem("refresh", response.data.refresh);
 
-      // Check user approval status
+      // Check user approval status with token refresh logic
       try {
         const userResponse = await axios.get("http://127.0.0.1:8000/me/", {
           headers: {
@@ -53,11 +53,57 @@ const Login = () => {
           }, 1000);
         }
       } catch (userError) {
-        // If can't get user info, proceed with normal login
-        setMessage("Login successful!");
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 1000);
+        // Token might be expired, try to refresh
+        if (userError.response?.status === 401) {
+          const refreshToken = localStorage.getItem("refresh");
+          if (refreshToken) {
+            try {
+              const refreshResponse = await axios.post(
+                "http://127.0.0.1:8000/auth/jwt/refresh/",
+                {
+                  refresh: refreshToken,
+                }
+              );
+              localStorage.setItem("access", refreshResponse.data.access);
+
+              // Try to get user info again with new token
+              const retryUserResponse = await axios.get(
+                "http://127.0.0.1:8000/me/",
+                {
+                  headers: {
+                    Authorization: `Bearer ${refreshResponse.data.access}`,
+                  },
+                }
+              );
+
+              if (retryUserResponse.data.approval_status === "pending") {
+                setMessage(
+                  "Sorry, your account is pending approval. Please try again after approval."
+                );
+                localStorage.removeItem("access");
+                localStorage.removeItem("refresh");
+              } else {
+                setMessage("Login successful!");
+                setTimeout(() => {
+                  window.location.href = "/";
+                }, 1000);
+              }
+            } catch {
+              // Refresh token also expired
+              localStorage.removeItem("access");
+              localStorage.removeItem("refresh");
+              setMessage("Login failed: Session expired. Please login again.");
+            }
+          } else {
+            setMessage("Login failed: Invalid credentials");
+          }
+        } else {
+          // Other error, proceed with normal login
+          setMessage("Login successful!");
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 1000);
+        }
       }
     } catch {
       // Handle authentication failure
