@@ -121,7 +121,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Pacific/Auckland'
 
 USE_I18N = True
 
@@ -165,6 +165,12 @@ DJOSER = {
     "SEND_ACTIVATION_EMAIL": False,  # Disable email activation for development (testing convenience)
     "ACTIVATION_URL": "activate?uid={uid}&token={token}",  # Email activation link URL pattern
     "PASSWORD_RESET_CONFIRM_URL": "reset-password?uid={uid}&token={token}",  # Password reset link URL pattern
+    "SERIALIZERS": {
+        "user_create": "users.serializers.CustomUserCreateSerializer",
+        "user_create_password_retype": "users.serializers.CustomUserCreateSerializer",
+        "user": "users.serializers.CustomUserSerializer",
+        "current_user": "users.serializers.CustomUserSerializer",
+    },
 }
 
 STATIC_URL = "static/"
