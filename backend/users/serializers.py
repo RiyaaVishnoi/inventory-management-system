@@ -28,6 +28,8 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         )
         extra_kwargs = {
             'password': {'write_only': True},
+            'first_name': {'required': True},
+            'last_name': {'required': True},
         }
     
     def validate_unitec_id(self, value):

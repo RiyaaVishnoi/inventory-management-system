@@ -28,10 +28,83 @@ const Login = () => {
       // Store JWT tokens in localStorage for future API requests
       localStorage.setItem("access", response.data.access);
       localStorage.setItem("refresh", response.data.refresh);
-      setMessage("Login successful!");
 
-      // Redirect to home page after successful login
-      window.location.href = "/";
+      // Check user approval status with token refresh logic
+      try {
+        const userResponse = await axios.get("http://127.0.0.1:8000/api/me/", {
+          headers: {
+            Authorization: `Bearer ${response.data.access}`,
+          },
+        });
+
+        if (userResponse.data.approval_status === "pending") {
+          setMessage(
+            "Sorry, your account is pending approval. Please try again after approval."
+          );
+          // Clear tokens since user can't access the system yet
+          localStorage.removeItem("access");
+          localStorage.removeItem("refresh");
+          // Don't redirect, let user see the message
+        } else {
+          setMessage("Login successful!");
+          // Redirect to home page after successful login
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 1000);
+        }
+      } catch (userError) {
+        // Token might be expired, try to refresh
+        if (userError.response?.status === 401) {
+          const refreshToken = localStorage.getItem("refresh");
+          if (refreshToken) {
+            try {
+              const refreshResponse = await axios.post(
+                "http://127.0.0.1:8000/api/auth/jwt/refresh/",
+                {
+                  refresh: refreshToken,
+                }
+              );
+              localStorage.setItem("access", refreshResponse.data.access);
+
+              // Try to get user info again with new token
+              const retryUserResponse = await axios.get(
+                "http://127.0.0.1:8000/api/me/",
+                {
+                  headers: {
+                    Authorization: `Bearer ${refreshResponse.data.access}`,
+                  },
+                }
+              );
+
+              if (retryUserResponse.data.approval_status === "pending") {
+                setMessage(
+                  "Sorry, your account is pending approval. Please try again after approval."
+                );
+                localStorage.removeItem("access");
+                localStorage.removeItem("refresh");
+              } else {
+                setMessage("Login successful!");
+                setTimeout(() => {
+                  window.location.href = "/";
+                }, 1000);
+              }
+            } catch {
+              // Refresh token also expired
+              localStorage.removeItem("access");
+              localStorage.removeItem("refresh");
+              setMessage("Login failed: Session expired. Please login again.");
+            }
+          } else {
+            setMessage("Login failed: Invalid credentials");
+          }
+        } else {
+          // Other error, proceed with normal login
+          setMessage("Login successful!");
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 1000);
+        }
+      }
     } catch {
       // Handle authentication failure
       setMessage("Login failed: Invalid credentials");
@@ -163,7 +236,7 @@ const Login = () => {
                   name="email"
                   value={form.email}
                   onChange={handleChange}
-                  placeholder="director@filmstudio.com"
+                  placeholder="example@myunitec.ac.nz"
                   className="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
                   required
                 />

@@ -6,9 +6,9 @@ const Signup = () => {
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
-    productionCompany: "",
     email: "",
-    username: "",
+    unitecId: "",
+    yearGroup: "",
     password: "",
     rePassword: "",
   });
@@ -35,30 +35,47 @@ const Signup = () => {
 
     try {
       // Send registration request to Djoser API endpoint
-      // Note: We need to send email, username, password, and re_password as required by the backend
+      // Note: We need to send email, password, re_password, first_name, last_name, unitec_id, year_group as required by the backend
       const registrationData = {
         email: form.email,
-        username: form.username,
         password: form.password,
         re_password: form.rePassword,
+        first_name: form.firstName,
+        last_name: form.lastName,
+        unitec_id: form.unitecId,
+        year_group: form.yearGroup,
       };
 
-      await axios.post(
-        "http://127.0.0.1:8000/api/auth/users/",
-        registrationData
-      );
-      setMessage("Signup successful! You can now log in.");
+      await axios.post("http://127.0.0.1:8000/api/auth/users/", registrationData);
 
-      // Redirect to login page after successful signup
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 2000);
+      // Check if email is from Unitec domain to determine approval status
+      const isUnitecEmail = form.email.includes("@myunitec.ac.nz");
+
+      if (isUnitecEmail) {
+        setMessage("Signup successful! You can now log in.");
+        // Redirect to login page after successful signup
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 2000);
+      } else {
+        setMessage(
+          "Signup successful! Your account is pending approval. You will be notified once approved."
+        );
+        // Redirect to login page after successful signup
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 3000);
+      }
     } catch (error) {
       // Handle different types of errors from the API
       if (error.response?.data?.email) {
         setMessage("Signup failed: " + error.response.data.email[0]);
-      } else if (error.response?.data?.username) {
-        setMessage("Signup failed: " + error.response.data.username[0]);
+      } else if (error.response?.data?.first_name) {
+        setMessage("Signup failed: " + error.response.data.first_name[0]);
+      } else if (error.response?.data?.last_name) {
+        setMessage("Signup failed: " + error.response.data.last_name[0]);
+      } else if (error.response?.data?.unitec_id) {
+        setMessage("Signup failed: " + error.response.data.unitec_id[0]);
       } else if (error.response?.data?.password) {
         setMessage("Signup failed: " + error.response.data.password[0]);
       } else if (error.response?.data?.re_password) {
@@ -220,13 +237,13 @@ const Signup = () => {
               </div>
             </div>
 
-            {/* Production Company Input Field */}
+            {/* Unitec Student ID Input Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Production company
+                Unitec Student ID
               </label>
               <div className="relative">
-                {/* Building icon for production company */}
+                {/* ID card icon for student ID */}
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
                     className="h-5 w-5 text-gray-400"
@@ -238,18 +255,17 @@ const Signup = () => {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                      d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V4a2 2 0 114 0v2m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"
                     />
                   </svg>
                 </div>
                 <input
                   type="text"
-                  name="productionCompany"
-                  value={form.productionCompany}
+                  name="unitecId"
+                  value={form.unitecId}
                   onChange={handleChange}
-                  placeholder="Your Film Studio"
+                  placeholder="1234567"
                   className="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
-                  required
                 />
               </div>
             </div>
@@ -281,20 +297,20 @@ const Signup = () => {
                   name="email"
                   value={form.email}
                   onChange={handleChange}
-                  placeholder="director@filmstudio.com"
+                  placeholder="example@myunitec.ac.nz"
                   className="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
                   required
                 />
               </div>
             </div>
 
-            {/* Username Input Field */}
+            {/* Year Group Input Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Username
+                Year Group (e.g., 2025, 2024)
               </label>
               <div className="relative">
-                {/* User icon for username */}
+                {/* Calendar icon for year group */}
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
                     className="h-5 w-5 text-gray-400"
@@ -306,18 +322,17 @@ const Signup = () => {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                     />
                   </svg>
                 </div>
                 <input
                   type="text"
-                  name="username"
-                  value={form.username}
+                  name="yearGroup"
+                  value={form.yearGroup}
                   onChange={handleChange}
-                  placeholder="johndoe"
+                  placeholder="2025"
                   className="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent"
-                  required
                 />
               </div>
             </div>

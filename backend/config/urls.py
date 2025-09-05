@@ -6,9 +6,9 @@ from users.views import me
 urlpatterns = [
     path("admin/", admin.site.urls),
 
-    # Djoser auth
-    path("auth/", include("djoser.urls")),
-    path("auth/", include("djoser.urls.jwt")),
+    # Djoser auth with api prefix
+    path("api/auth/", include("djoser.urls")),
+    path("api/auth/", include("djoser.urls.jwt")),
 
     # OpenAPI schema + Swagger UI (drf-spectacular)
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
@@ -19,5 +19,5 @@ urlpatterns = [
     ),
 
     # Test protected endpoint
-    path("me/", me),
+    path("api/me/", me),
 ]
